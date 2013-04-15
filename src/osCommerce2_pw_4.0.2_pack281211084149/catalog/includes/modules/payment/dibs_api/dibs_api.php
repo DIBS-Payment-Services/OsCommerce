@@ -177,14 +177,25 @@ class dibs_api extends dibs_helpers {
                 $aData ['oiRow' . $sZeros . $i] = round($oItem->qty) . ";" . 
                                       "pcs" . ";" . 
                                       $oItem->name . ";" .
-                                      round($oItem->price / 100, 2) . ";" .
+                                      round($oItem->price, 2) . ";" .
                                       $oItem->item_id . ";" .
-                                      round($oItem->tax_rate / 100, 2);
+                                      round($oItem->tax_rate, 2);
                 $i++;
             }
 	}
         
+        // Apply shipping 
+        if($oOrderInfo->shipping->rate) {
+            $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
+                                      "pcs" . ";" . 
+                                      "Shipping;" .
+                                      $oOrderInfo->shipping->rate . ";" .
+                                      'id'.$sZeros.$i.";0" ;
+                                      
+        }
+        
         $aData ['yourRef'] = $oOrderInfo->order->order_id;
+        
     }
     
     /**
@@ -227,7 +238,7 @@ class dibs_api extends dibs_helpers {
      */
     function dibs_api_getFormAction($iPayMethod) {
         if ($iPayMethod == '2') {
-            return 'https://pay.dibspayment.com/';
+            return 'https://sat1.dibspayment.com/dibspaymentwindow/entrypoint';
 	}
         elseif ($iPayMethod == '3') {
             return 'https://mopay.dibspayment.com/';
