@@ -1,26 +1,5 @@
 <?php
-class dibsflex_helpers_cms {
-    
-    function osc_cgiButtonsRealID($iRealId) {
-        $mPostId = $this->osc_getPostId($iRealId);
-        if($mPostId !== FALSE) {
-            return $this->dibsflex_api_cgiButtons($mPostId);
-        }
-        else return '';
-    }
-    
-    function osc_getPostId($iRealId) {
-        $mOrderData = $this->dibsflex_helper_dbquery_read("SELECT 
-                                                   `session_cart_id` AS oid 
-                                                    FROM `dibs_order_to_session` 
-                                                    WHERE `order_id` = '" . 
-                                                    $iRealId . 
-                                                    "' LIMIT 1;");
-        
-        $mSingle = $this->dbquery_read_fetch($mOrderData);
-        if(isset($mSingle[0]['oid'])) return $mSingle[0]['oid'];
-        else return FALSE;
-    }
+class dibs_helpers_cms {
     
     function dbquery_read_fetch($mQuery) {
         while ($aFetch = tep_db_fetch_array($mQuery)) {
@@ -39,7 +18,7 @@ class dibsflex_helpers_cms {
     }
     
     function osc_getOrderData($mPostOrderId) {
-        $mOrderData = $this->dibsflex_helper_dbquery_read("SELECT 
+        $mOrderData = $this->dibs_helper_dbquery_read("SELECT 
                                                    `session_cart_id` AS order_id, 
                                                    `amount` AS total,
                                                    `currency`
@@ -54,11 +33,11 @@ class dibsflex_helpers_cms {
     }
     
     function osc_completeCart($iOrderId, $mCartId) {
-        $this->dibsflex_helper_dbquery_write("UPDATE `dibs_order_to_session` SET `order_id`='" .
+        $this->dibs_helper_dbquery_write("UPDATE `dibs_order_to_session` SET `order_id`='" .
                                    $iOrderId . "' WHERE `session_cart_id`='" .
                                    addslashes($mCartId) . "' LIMIT 1;");
-        $this->dibsflex_helper_dbquery_write("UPDATE `orders_status_history` 
-                                   SET `comments`=CONCAT('[DIBS Order ID: " . $mCartId . "] \n', `comments`) 
+        $this->dibs_helper_dbquery_write("UPDATE `orders_status_history` 
+                                   SET `comments`=CONCAT('[DIBS Order ID: " . $mCartId . "] \n', `comments`)  
                                    WHERE `orders_id`='" .
                                    $iOrderId . "' AND `orders_status_id`='" . 
                                    $this->order_status . "' LIMIT 1;");
@@ -67,7 +46,7 @@ class dibsflex_helpers_cms {
     function osc_processHelperTable($oOrderInfo) {
         $this->osc_helperTable();
         
-        $mOrderExists = $this->dibsflex_helper_dbquery_read("SELECT COUNT(`session_cart_id`) 
+        $mOrderExists = $this->dibs_helper_dbquery_read("SELECT COUNT(`session_cart_id`) 
                                                     AS session_cart_exists 
                                                     FROM `dibs_order_to_session` 
                                                     WHERE `session_cart_id` = '" . 
@@ -77,7 +56,7 @@ class dibsflex_helpers_cms {
         $aResult = $this->dbquery_read_fetch($mOrderExists);
         
         if($aResult[0]['session_cart_exists'] > 0) {
-            $this->dibsflex_helper_dbquery_write("DELETE FROM `dibs_order_to_session` 
+            $this->dibs_helper_dbquery_write("DELETE FROM `dibs_order_to_session` 
                                         WHERE `session_cart_id` = '" . 
                                         $oOrderInfo->order->order_id . 
                                        "' LIMIT 1;");
@@ -93,7 +72,7 @@ class dibsflex_helpers_cms {
     }
     
     function osc_helperTable() {
-        $this->dibsflex_helper_dbquery_write("CREATE TABLE IF NOT EXISTS `dibs_order_to_session` (
+        $this->dibs_helper_dbquery_write("CREATE TABLE IF NOT EXISTS `dibs_order_to_session` (
                                        `session_cart_id` VARCHAR(45) NOT NULL DEFAULT '',
                                        `order_id` VARCHAR(45) NOT NULL DEFAULT '',
                                        `amount` INTEGER UNSIGNED NOT NULL DEFAULT 0,
@@ -103,7 +82,7 @@ class dibsflex_helpers_cms {
     
     function osc_getShippingRate() {
         $aShippingId = explode("_", $_SESSION['shipping']['id']);
-        $mShippingQuery = $this->dibsflex_helper_dbquery_read("SELECT `configuration_value` FROM " . 
+        $mShippingQuery = $this->dibs_helper_dbquery_read("SELECT `configuration_value` FROM " . 
                                     TABLE_CONFIGURATION . " WHERE `configuration_key`='MODULE_SHIPPING_".$aShippingId[0]."_TAX_CLASS'");
         unset($aShippingId);
         $aResult = $this->dbquery_read_fetch($mShippingQuery);
@@ -115,84 +94,46 @@ class dibsflex_helpers_cms {
         else return '0';
     }
 
-    
     /**
-     * Creating settings pulldown list (<select>) for FlexWin language
+     * Creating settings pulldown list (<select>) for PW language
      */
-    function osc_selectGetLangFlex($sValue, $sKey = '') {
+    function osc_selectGetLang($sValue, $sKey = '') {
         $sName = (($sKey) ? 'configuration[' . $sKey . ']' : 'configuration_value');
 
-        $aLangFlexArray = array();
-        $aLangFlexArray = array(
-                             array('id' => 'da',
+        $aLangArray = array();
+        $aLangArray = array(
+                             array('id' => 'da_DK',
                                    'text' => 'Danish'),
-                             array('id' => 'nl',
-                                   'text' => 'Dutch'),
-                             array('id' => 'en',
+                             array('id' => 'en_UK',
                                    'text' => 'English'),
-                             array('id' => 'fo',
-                                   'text' => 'Faroese'),
-                             array('id' => 'fi',
+                             array('id' => 'fi_FIN',
                                    'text' => 'Finnish'),
-                             array('id' => 'fr',
-                                   'text' => 'French'),
-                             array('id' => 'de',
-                                   'text' => 'German'),
-                             array('id' => 'it',
-                                   'text' => 'Italian'),
-                             array('id' => 'no',
+                             array('id' => 'nb_NO',
                                    'text' => 'Norwegian'),
-                             array('id' => 'pl',
-                                   'text' => 'Polish'),
-                             array('id' => 'es',
-                                   'text' => 'Spanish'),
-                             array('id' => 'sv',
+                             array('id' => 'sv_SE',
                                    'text' => 'Swedish'),
                          );
 
-        return tep_draw_pull_down_menu($sName, $aLangFlexArray, $sValue);
+        return tep_draw_pull_down_menu($sName, $aLangArray, $sValue);
     }
     
     /**
-     * Creating settings pulldown list (<select>) for FlexWin decorators
+     * Creating settings pulldown list (<select>) for payment methods
      */
-    function osc_selectGetDecor($sValue, $sKey = '') {
+    function osc_selectGetMethods($sValue, $sKey = '') {
         $sName = (($sKey) ? 'configuration[' . $sKey . ']' : 'configuration_value');
 
-        $aDecorArray = array();
-        $aDecorArray = array(
-                             array('id' => 'default',
-                                   'text' => 'Default'),
-                             array('id' => 'basal',
-                                   'text' => 'Basal'),
-                             array('id' => 'rich',
-                                   'text' => 'Rich'),
-                             array('id' => 'own',
-                                   'text' => 'Own decorator')
+        $aMethodsArray = array();
+        $aMethodsArray = array(
+                             array('id' => '1',
+                                   'text' => 'Auto'),
+                             array('id' => '2',
+                                   'text' => 'Standart Payment Window'),
+                             array('id' => '3',
+                                   'text' => 'Mobile Payment Window')
                          );
 
-        return tep_draw_pull_down_menu($sName, $aDecorArray, $sValue);
-    }
-    
-    /**
-     * Creating settings pulldown list (<select>) for FlexWin color
-     */
-    function osc_selectGetColor($sValue, $sKey = '') {
-        $sName = (($sKey) ? 'configuration[' . $sKey . ']' : 'configuration_value');
-
-        $aColorArray = array();
-        $aColorArray = array(
-                             array('id' => 'blank',
-                                   'text' => 'None'),
-                             array('id' => 'sand',
-                                   'text' => 'Sand'),
-                             array('id' => 'grey',
-                                   'text' => 'Grey'),
-                             array('id' => 'blue',
-                                   'text' => 'Blue')
-                         );
-
-        return tep_draw_pull_down_menu($sName, $aColorArray, $sValue);
+        return tep_draw_pull_down_menu($sName, $aMethodsArray, $sValue);
     }
     
     /**

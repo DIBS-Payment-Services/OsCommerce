@@ -15,11 +15,11 @@
 
 chdir('../../../../');
 require('includes/application_top.php');
-require(DIR_WS_LANGUAGES . $language . '/modules/payment/dibsflex.php');
-require(DIR_WS_MODULES . '/payment/dibsflex.php');
+require(DIR_WS_LANGUAGES . $language . '/modules/payment/dibs.php');
+require(DIR_WS_MODULES . 'payment/dibs.php');
 
-$oDIBSflex = new dibsflex();
+$oDIBS = new dibs();
 
-$oDIBSflex->cancel();
+$oDIBS->cancel();
   
 ?>
