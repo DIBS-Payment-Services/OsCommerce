@@ -767,7 +767,7 @@ class dibsflex_api extends dibsflex_helpers {
                 if($oState->status == 2 || $oState->status == 5) {
                     $sOutput .= '<tr><td style="vertical-align: top; padding: 5px 5px 5px 0px;">
                                 Actions:</td><td style="padding: 5px;">
-                                <form id="dibsflex_cgiform" action="' .  
+                                <form id="dibsflex_cgiform"  accept-charset="UTF-8" action="' .  
                                 $this->dibsflex_helper_getReturnURLs('cgi') . 
                                 '" method="POST">
                                 <input type="hidden" name="transact" value="' . $sTransac . '" />
