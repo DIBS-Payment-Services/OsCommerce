@@ -275,9 +275,6 @@ class dibs extends dibs_api {
         $this->installApply('Test mode:', 'MODULE_PAYMENT_DIBS_TESTMODE', 
                             'yes', 'Use test mode', 
                             4, "'tep_cfg_select_option(array(\'yes\', \'no\'),'");
-        $this->installApply('Unique order Id:', 'MODULE_PAYMENT_DIBS_UNIQ', 
-                            'no', 'Only unique order IDs', 
-                            5, "'tep_cfg_select_option(array(\'yes\', \'no\'),'");
         $this->installApply('Add fee:', 'MODULE_PAYMENT_DIBS_FEE', 
                             'no', 'Add fee to payment', 
                             6, "'tep_cfg_select_option(array(\'yes\', \'no\'),'");
@@ -305,7 +302,6 @@ class dibs extends dibs_api {
         $this->installApply('Sort order:', 'MODULE_PAYMENT_DIBS_SORT_ORDER',
                             '0', 'Sort order in list of availiable payment methods.', 
                             22, "NULL");
-                
         $this->installApply('Checkout type:', 'MODULE_PAYMENT_DIBS_METHOD', 
                             '2', 'Standart or Mobile Payment Window or Auto.', 
                             3, "'dibs::osc_selectGetMethods('");
@@ -331,7 +327,6 @@ class dibs extends dibs_api {
     function keys() {
         return array('MODULE_PAYMENT_DIBS_STATUS', 'MODULE_PAYMENT_DIBS_TEXT_TITLE',
                      'MODULE_PAYMENT_DIBS_MID', 'MODULE_PAYMENT_DIBS_METHOD',
-                     'MODULE_PAYMENT_DIBS_TESTMODE', 'MODULE_PAYMENT_DIBS_UNIQ', 
                      'MODULE_PAYMENT_DIBS_FEE', 'MODULE_PAYMENT_DIBS_VOUCHER', 
                      'MODULE_PAYMENT_DIBS_PAYTYPE', 'MODULE_PAYMENT_DIBS_HMAC', 
                      'MODULE_PAYMENT_DIBS_LANG',

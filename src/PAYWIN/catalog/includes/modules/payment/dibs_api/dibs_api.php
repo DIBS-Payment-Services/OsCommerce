@@ -152,8 +152,8 @@ class dibs_api extends dibs_helpers {
         $aData ['billingPostalCode']   = $oOrderInfo->customer->billing->postcode;
         $aData ['billingPostalPlace']  = $oOrderInfo->customer->billing->city;
         $aData ['billingAddress']      = $oOrderInfo->customer->billing->country . " " .
-                                        $oOrderInfo->customer->billing->region;
-        $aData ['billingMobile']       = $oOrderInfo->customer->billing->phone;
+                                         $oOrderInfo->customer->billing->region;
+        $aData ['billingMobile']       = str_replace("-","",$oOrderInfo->customer->billing->phone);
         $aData ['billingEmail']        = $oOrderInfo->customer->billing->email;
 	
         $aData ['shippingFirstName']   = $oOrderInfo->customer->delivery->firstname;
@@ -163,8 +163,8 @@ class dibs_api extends dibs_helpers {
         $aData ['shippingPostalPlace'] = $oOrderInfo->customer->delivery->city;
         $aData ['shippingAddress']     = $oOrderInfo->customer->delivery->country . " " .
                                          $oOrderInfo->customer->delivery->region;
-        $aData ['s_shippingMobile']      = $oOrderInfo->customer->delivery->phone;
-        $aData ['s_shippingEmail']       = $oOrderInfo->customer->delivery->email;
+        $aData ['s_shippingMobile']    = str_replace("-","",$oOrderInfo->customer->delivery->phone);
+        $aData ['s_shippingEmail']     = $oOrderInfo->customer->delivery->email;
 
         if ($oOrderInfo->items) {
             $aData ['oitypes'] = 'QUANTITY;UNITCODE;DESCRIPTION;AMOUNT;ITEMID;VATAMOUNT';
@@ -260,11 +260,6 @@ class dibs_api extends dibs_helpers {
             $sHMAC = $this->dibs_api_hextostr($sHMAC);
             $sDataString = "";
             ksort($aData);
-            
-            
-            //var_dump($aData);
-            
-            //exit;
             foreach($aData as $key => $value) {
                 if($bURLDecode === TRUE) {
                     $sDataString .= "&" . $key . "=" .urldecode($value);
@@ -273,21 +268,7 @@ class dibs_api extends dibs_helpers {
                     $sDataString .= "&" . $key . "=" .$value;
                 }
             }
-            
-            // echo "left-hand" . $sDataString . "right-hand";
             $sDataString = ltrim($sDataString, "&");
-            
-            $fl = fopen("D:\\osc-test.txt", "w+");
-            
-            fputs($fl, $sDataString);
-            
-            
-          
-            
-            //var_dump($aData);
-            //exit;
-            
-            
             $sMAC = hash_hmac("sha256", $sDataString, $sHMAC);
         }
         return $sMAC;

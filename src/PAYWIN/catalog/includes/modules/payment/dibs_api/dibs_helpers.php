@@ -171,7 +171,7 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
     }
     
     function dibs_helper_modVersion() {
-        return "osc2_4.0.3";
+        return "osc2_4.0.4";
     }
     /** END OF DIBS HELPERS AREA **/
 }
