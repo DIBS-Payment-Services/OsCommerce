@@ -262,10 +262,10 @@ class dibs_api extends dibs_helpers {
             ksort($aData);
             foreach($aData as $key => $value) {
                 if($bURLDecode === TRUE) {
-                    $sDataString .= "&" . $key . "=" .urldecode($value);
+                    $sDataString .= "&" . trim($key) . "=" .trim(urldecode($value));
                 }
                 else {
-                    $sDataString .= "&" . $key . "=" .$value;
+                    $sDataString .= "&" . trim($key) . "=" .trim($value);
                 }
             }
             $sDataString = ltrim($sDataString, "&");
