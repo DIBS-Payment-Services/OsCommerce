@@ -178,8 +178,7 @@ class dibs_api extends dibs_helpers {
                                       "pcs" . ";" . 
                                       $oItem->name . ";" .
                                       round($oItem->price, 2) . ";" .
-                                      $oItem->item_id . ";" .
-                                      round($oItem->tax_rate, 2);
+                                      $oItem->item_id . ";".'0';
                 $i++;
             }
 	}
@@ -189,9 +188,17 @@ class dibs_api extends dibs_helpers {
             $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
                                       "pcs" . ";" . 
                                       "Shipping;" .
-                                      $oOrderInfo->shipping->rate . ";" .
+                                      $oOrderInfo->shipping->rate . ";".'id'.$sZeros.$i.";0" ;
+            $i++;                        
+        }
+      
+        // Total Tax 
+        if($oOrderInfo->shipping->tax){
+             $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
+                                      "pcs" . ";" . 
+                                      "Total Tax;" .
+                                      $oOrderInfo->shipping->tax . ";" .
                                       'id'.$sZeros.$i.";0" ;
-                                      
         }
         
         $aData ['s_yourRef'] = $oOrderInfo->order->order_id;

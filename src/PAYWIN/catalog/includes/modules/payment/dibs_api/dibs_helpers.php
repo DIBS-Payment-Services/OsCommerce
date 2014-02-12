@@ -148,12 +148,10 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
                          $mOrderInfo->info['currency_value'];
         }
         else $sTmpPrice = $mOrderInfo->info['shipping_cost'];
-        
         return (object)array(
                 'method' => $mOrderInfo->info['shipping_method'],
                 'rate'  => round($sTmpPrice, 2) * 100,
-                'tax'   => round($sTmpPrice * 
-                           $this->osc_getShippingRate(), 2) * 100
+                'tax'   => round($mOrderInfo->info['tax'], 2) * 100
             );
     }
 
@@ -171,7 +169,7 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
     }
     
     function dibs_helper_modVersion() {
-        return "osc2_4.0.4";
+        return "osc2_4.0.6";
     }
     /** END OF DIBS HELPERS AREA **/
 }
