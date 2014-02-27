@@ -118,7 +118,7 @@ class dibs_api extends dibs_helpers {
         $aData['currency'] = $oOrderInfo->order->currency;
         $aData['callbackurl'] = $this->dibs_helper_getReturnURLs("callback");
         $aData['s_callbackfix'] = $this->dibs_helper_getReturnURLs("callbackfix");
-        
+	        
         
         $sAccount = $this->dibs_helper_getconfig('account');
         if((string)$sAccount != "") {
@@ -215,7 +215,9 @@ class dibs_api extends dibs_helpers {
 	$aData['cancelreturnurl'] = $this->dibs_helper_getReturnURLs('cancel');
         $aData['language'] = $this->dibs_helper_getconfig('lang');
         $aData['s_sysmod']    = $this->dibs_helper_modVersion();
-        
+	
+ 	$aData['s_partnerid']  = $this->dibs_helper_getconfig('pid');     
+   
         $sFee = $this->dibs_helper_getconfig('fee');
         if((string)$sFee == 'yes') {
             $aData['addfee'] = 1;

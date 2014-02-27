@@ -289,6 +289,9 @@ class dibs extends dibs_api {
         $this->installApply('Merchant Id:', 'MODULE_PAYMENT_DIBS_MID', 
                             '', 'Your merchant id in DIBS service.', 
                             2, 'NULL');
+        $this->installApply('Pertner Id:', 'MODULE_PAYMENT_DIBS_PID', 
+                            '', 'Partner Id.', 
+                            0, 'NULL');	
         $this->installApply('Account:', 'MODULE_PAYMENT_DIBS_ACCOUNT', 
                             '', 'An "account number" may be inserted in this field, so as to separate transactions at DIBS.', 
                             14, "NULL");
@@ -326,7 +329,7 @@ class dibs extends dibs_api {
      */
     function keys() {
         return array('MODULE_PAYMENT_DIBS_STATUS', 'MODULE_PAYMENT_DIBS_TEXT_TITLE',
-                     'MODULE_PAYMENT_DIBS_MID', 'MODULE_PAYMENT_DIBS_METHOD',
+                     'MODULE_PAYMENT_DIBS_MID', 'MODULE_PAYMENT_DIBS_PID' ,'MODULE_PAYMENT_DIBS_METHOD',
                      'MODULE_PAYMENT_DIBS_FEE', 'MODULE_PAYMENT_DIBS_VOUCHER', 
                      'MODULE_PAYMENT_DIBS_PAYTYPE', 'MODULE_PAYMENT_DIBS_HMAC', 
                      'MODULE_PAYMENT_DIBS_LANG',
