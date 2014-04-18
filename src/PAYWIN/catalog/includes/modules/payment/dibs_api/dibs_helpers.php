@@ -165,11 +165,33 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
     }
     
     function dibs_helper_afterCallback($oOrder) {
-        return true;
+      $orderId = $oOrder->order_id;
+      $dibsInvoiceFields = array("acquirerLastName",          "acquirerFirstName",
+                                       "acquirerDeliveryAddress",   "acquirerDeliveryPostalCode",
+                                       "acquirerDeliveryPostalPlace" );
+      $dibsInvoiceFieldsString = "";
+      foreach($_POST as $key=>$value) {
+              if(in_array($key, $dibsInvoiceFields)) {
+                   $dibsInvoiceFieldsString .= "{$key}={$value}\n";              
+              }
+         }
+         
+      if($dibsInvoiceFieldsString) {
+        $result =  $this->dibs_helper_dbquery_read("SELECT `order_id` FROM `dibs_order_to_session` WHERE `session_cart_id` = '{$orderId}'");	
+        $aResult = $this->dbquery_read_fetch($result);
+        $orderId = $aResult[0]['order_id']; 
+        $result =  $this->dibs_helper_dbquery_read("SELECT `comments` FROM `orders_status_history` WHERE `orders_id` = '{$orderId}'");	
+        $aResult = $this->dbquery_read_fetch($result);
+        $comment = $aResult[0]['comments']." $dibsInvoiceFieldsString";
+        $this->dibs_helper_dbquery_write("UPDATE ". TABLE_ORDERS_STATUS_HISTORY ." 
+                                   SET comments = '" . $comment . "' WHERE `orders_id`='" .
+                                   $orderId . "'");
+      }
+      return true;
     }
     
     function dibs_helper_modVersion() {
-        return "osc2_4.0.7";
+        return "osc2_4.0.8";
     }
     /** END OF DIBS HELPERS AREA **/
 }

@@ -233,10 +233,10 @@ class dibs_api extends dibs_helpers {
             $aData['test'] = 1;
         }
         
-        $sUid = $this->dibs_helper_getconfig('uniq');
+        /*$sUid = $this->dibs_helper_getconfig('uniq');
         if((string)$sUid == 'yes') {
             $aData['uniqueid'] = $aData['orderid'];
-        }
+        }*/
     }
     
     /**
@@ -590,7 +590,7 @@ class dibs_api extends dibs_helpers {
                                                $this->dibs_api_sqlEncode($_POST['orderid']) . 
                                               "' LIMIT 1;");
        
-        if ($this->dibs_helper_dbquery_read_single($mStatus, 'status') == 0) {
+        if($this->dibs_helper_dbquery_read_single($mStatus, 'status') == 0) {
             $iPayMethod = $this->dibs_api_detectMethod();
             
             $aFieldsList = $this->dibs_api_DBarray();
