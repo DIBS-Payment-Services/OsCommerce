@@ -131,12 +131,13 @@ class dibs_api extends dibs_helpers {
         }
         
         $sDistributionType = $this->dibs_helper_getconfig('distr');
-        if((string)$sDistributionType != 'empty') {
+  
+        /* if((string)$sDistributionType != 'empty') {
             $aData['distributionType'] = $sDistributionType;
             if ($sDistributionType == 'email'){
             	$aData['email'] = $oOrderInfo->customer->billing->email;
             }
-	}
+	} */
     }
     
     /**
