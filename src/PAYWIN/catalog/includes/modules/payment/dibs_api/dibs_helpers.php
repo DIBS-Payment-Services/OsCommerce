@@ -142,6 +142,10 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
     }
 
     function dibs_helper_getShippingObj($mOrderInfo) {
+        global $shipping;
+        $module = substr($GLOBALS['shipping']['id'], 0, strpos($GLOBALS['shipping']['id'], '_'));
+        $shipping_tax = tep_get_tax_rate($GLOBALS[$module]->tax_class, $mOrderInfo->delivery['country']['id'], $mOrderInfo->delivery['zone_id']);
+   
         if(isset($mOrderInfo->info['currency_value']) && 
                  $mOrderInfo->info['currency_value'] > 0) {
             $sTmpPrice = $mOrderInfo->info['shipping_cost'] * 
@@ -151,7 +155,7 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
         return (object)array(
                 'method' => $mOrderInfo->info['shipping_method'],
                 'rate'  => round($sTmpPrice, 2) * 100,
-                'tax'   => round($mOrderInfo->info['tax'], 2) * 100
+                'tax'   => round((($shipping['cost'] * $shipping_tax)/100), 2) * 100
             );
     }
 
@@ -168,7 +172,7 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
       $orderId = $oOrder->order_id;
       $dibsInvoiceFields = array("acquirerLastName",          "acquirerFirstName",
                                        "acquirerDeliveryAddress",   "acquirerDeliveryPostalCode",
-                                       "acquirerDeliveryPostalPlace" );
+                                       "acquirerDeliveryPostalPlace", "transaction" );
       $dibsInvoiceFieldsString = "";
       foreach($_POST as $key=>$value) {
               if(in_array($key, $dibsInvoiceFields)) {

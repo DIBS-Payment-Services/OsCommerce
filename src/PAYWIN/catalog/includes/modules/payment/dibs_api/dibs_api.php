@@ -179,27 +179,36 @@ class dibs_api extends dibs_helpers {
                                       "pcs" . ";" . 
                                       $oItem->name . ";" .
                                       round($oItem->price, 2) . ";" .
-                                      $oItem->item_id . ";".'0';
+                                      $oItem->item_id . ";".round($oItem->tax_rate,2);
                 $i++;
             }
 	}
         
-        // Apply shipping 
-        if($oOrderInfo->shipping->rate) {
+          if($oOrderInfo->shipping->rate) {
+            $shippingTax = $oOrderInfo->shipping->tax; 
             $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
-                                      "pcs" . ";" . 
+                                      "pcs" . ";" .
                                       "Shipping;" .
-                                      $oOrderInfo->shipping->rate . ";".'id'.$sZeros.$i.";0" ;
-            $i++;                        
-        }
-      
-        // Total Tax 
-        if($oOrderInfo->shipping->tax){
-             $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
+                                      $oOrderInfo->shipping->rate . ";" .
+                                      'id'.$sZeros.$i.";$shippingTax";
+						$i++;                            
+            }
+           /*if( $oOrderInfo->order->tax ) {
+	      $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
+	                              "pcs" . ";" .
+	                               "Total Tax;" .
+	                               $oOrderInfo->order->tax . ";" .
+	                               'id'.$sZeros.$i.";0" ;                             
+	   }*/
+        
+        // Apply discount
+        if($oOrderInfo->discount->rate) {
+           $aData ['oiRow' . $sZeros . $i] = 1 . ";" .
                                       "pcs" . ";" . 
-                                      "Total Tax;" .
-                                      $oOrderInfo->shipping->tax . ";" .
+                                       $oOrderInfo->discount->method . ";-" .
+                                       $oOrderInfo->discount->rate .  ";" .
                                       'id'.$sZeros.$i.";0" ;
+
         }
         
         $aData ['s_yourRef'] = $oOrderInfo->order->order_id;
