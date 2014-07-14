@@ -286,7 +286,7 @@ class dibs extends dibs_api {
                             'DIBS (PW) | Secure Payment Services', 
                             'Title of payment system that customer see on checkout.', 
                             1, 'NULL');
-        $this->installApply('Merchant Id:', 'MODULE_PAYMENT_DIBS_MID', 
+        $this->installApply('DIBS Integration ID:', 'MODULE_PAYMENT_DIBS_MID', 
                             '', 'Your merchant id in DIBS service.', 
                             2, 'NULL');
         $this->installApply('Pertner Id:', 'MODULE_PAYMENT_DIBS_PID', 
