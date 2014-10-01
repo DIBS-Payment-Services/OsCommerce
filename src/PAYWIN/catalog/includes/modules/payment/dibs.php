@@ -286,8 +286,8 @@ class dibs extends dibs_api {
                             'DIBS (PW) | Secure Payment Services', 
                             'Title of payment system that customer see on checkout.', 
                             1, 'NULL');
-        $this->installApply('DIBS Integration ID:', 'MODULE_PAYMENT_DIBS_MID', 
-                            '', 'Your merchant id in DIBS service.', 
+        $this->installApply('Merchant Id/Integration ID:', 'MODULE_PAYMENT_DIBS_MID', 
+                            '', 'Your "Integration ID" or "Merchant Id" it depends on which platform (D2 or DX) you are using. For more info look here: <a href="http://tech.dibspayment.com/platformfinder" style="color:#2E6E9E;"><b>http://tech.dibspayment.com/platformfinder</b></a>', 
                             2, 'NULL');
         $this->installApply('Pertner Id:', 'MODULE_PAYMENT_DIBS_PID', 
                             '', 'Partner Id.', 
@@ -335,7 +335,8 @@ class dibs extends dibs_api {
                      'MODULE_PAYMENT_DIBS_LANG',
                      'MODULE_PAYMENT_DIBS_ACCOUNT','MODULE_PAYMENT_DIBS_DISTR',
                      'MODULE_PAYMENT_DIBS_ORDER_STATUS_ID', 'MODULE_PAYMENT_DIBS_ZONE',
-                     'MODULE_PAYMENT_DIBS_SORT_ORDER'
+                     'MODULE_PAYMENT_DIBS_SORT_ORDER',
+		     'MODULE_PAYMENT_DIBS_TESTMODE'
                      );
     }
 }

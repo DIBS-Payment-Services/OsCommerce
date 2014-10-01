@@ -10,7 +10,7 @@ class dibs_helpers_cms {
     
     function osc_detectPost() {
         foreach($_SESSION['navigation']->path as $sKey => &$aPath) {
-            if($aPath['page'] == 'success.php' && isset($aPath['post']['orderid'])) {
+            if(false !== strpos($aPath['page'], "success.php") && isset($aPath['post']['orderid'])) {
                 return $aPath['post'];
             }
         }
