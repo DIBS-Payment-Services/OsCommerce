@@ -77,8 +77,7 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
             else $sTotal = $mOrderInfo->info['total'];
             
             return (object)array(
-                'order_id'  => $_SESSION['cartID'] . $_SESSION['customer_id'] .
-                               date("dmyHi"),
+                'order_id'  => $_POST['orderid'],
                 'total'     => round($sTotal, 2) * 100,
                 'currency'  => $this->dibs_api_getCurrencyValue(
                                   $mOrderInfo->info['currency']
@@ -169,33 +168,22 @@ class dibs_helpers extends dibs_helpers_cms implements dibs_helpers_iface {
     }
     
     function dibs_helper_afterCallback($oOrder) {
-      $orderId = $oOrder->order_id;
-      $dibsInvoiceFields = array("acquirerLastName",          "acquirerFirstName",
-                                       "acquirerDeliveryAddress",   "acquirerDeliveryPostalCode",
-                                       "acquirerDeliveryPostalPlace", "transaction" );
-      $dibsInvoiceFieldsString = "";
-      foreach($_POST as $key=>$value) {
-              if(in_array($key, $dibsInvoiceFields)) {
-                   $dibsInvoiceFieldsString .= "{$key}={$value}\n";              
-              }
-         }
-         
-      if($dibsInvoiceFieldsString) {
-        $result =  $this->dibs_helper_dbquery_read("SELECT `order_id` FROM `dibs_order_to_session` WHERE `session_cart_id` = '{$orderId}'");	
-        $aResult = $this->dbquery_read_fetch($result);
-        $orderId = $aResult[0]['order_id']; 
-        $result =  $this->dibs_helper_dbquery_read("SELECT `comments` FROM `orders_status_history` WHERE `orders_id` = '{$orderId}'");	
-        $aResult = $this->dbquery_read_fetch($result);
-        $comment = $aResult[0]['comments']." $dibsInvoiceFieldsString";
-        $this->dibs_helper_dbquery_write("UPDATE ". TABLE_ORDERS_STATUS_HISTORY ." 
-                                   SET comments = '" . $comment . "' WHERE `orders_id`='" .
-                                   $orderId . "'");
-      }
+     $status = $_POST['status'];
+     $statueseArr = array("ACCEPTED", "PENDING", "DECLINED");
+     $insert_id = $_POST['orderid'];
+     if(in_array($status, $statueseArr) ) {
+        $sql_data_array = array('orders_id' => $insert_id, 
+                          'orders_status_id' => 2, 
+                          'date_added' => 'now()', 
+                          'customer_notified' => 0,
+                          'comments' => "DIBS returned callback with status:{$status}\n transactionid: {$_POST['transaction']}");
+      tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array); 
+     }
       return true;
     }
     
     function dibs_helper_modVersion() {
-        return "osc2_4.0.9";
+        return "osc2_4.0.8.1";
     }
     /** END OF DIBS HELPERS AREA **/
 }

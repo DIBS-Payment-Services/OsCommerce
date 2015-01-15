@@ -17,14 +17,11 @@ class dibs_api extends dibs_helpers {
         
         $this->dibs_api_applyCommon($aData, $oOrderInfo);
         
-        $iPayMethod = $this->dibs_api_getMethod();
-        $aData['s_pw'] = $iPayMethod;
+       // $iPayMethod = $this->dibs_api_getMethod();
+        //$aData['s_pw'] = $iPayMethod;
         
         $this->dibs_api_applyCommonWin($aData);
-        if($iPayMethod == 2) $this->dibs_api_applyInvoice($aData, $oOrderInfo);
-        $sMAC = $this->dibs_api_calcMAC($aData);
-        if($sMAC != "") $aData['MAC'] = $sMAC;
-        
+        $this->dibs_api_applyInvoice($aData, $oOrderInfo);
         return $aData;
     }
     
@@ -131,13 +128,7 @@ class dibs_api extends dibs_helpers {
         }
         
         $sDistributionType = $this->dibs_helper_getconfig('distr');
-  
-        /* if((string)$sDistributionType != 'empty') {
-            $aData['distributionType'] = $sDistributionType;
-            if ($sDistributionType == 'email'){
-            	$aData['email'] = $oOrderInfo->customer->billing->email;
-            }
-	} */
+        
     }
     
     /**
@@ -211,7 +202,7 @@ class dibs_api extends dibs_helpers {
 
         }
         
-        $aData ['s_yourRef'] = $oOrderInfo->order->order_id;
+        //$aData ['s_yourRef'] = $oOrderInfo->order->order_id;
         
     }
     
@@ -226,18 +217,13 @@ class dibs_api extends dibs_helpers {
         $aData['language'] = $this->dibs_helper_getconfig('lang');
         $aData['s_sysmod']    = $this->dibs_helper_modVersion();
 	
- 	$aData['s_partnerid']  = $this->dibs_helper_getconfig('pid');     
+ 	($this->dibs_helper_getconfig('pid')) ? $aData['s_partnerid']  = $this->dibs_helper_getconfig('pid') : 0;     
    
         $sFee = $this->dibs_helper_getconfig('fee');
         if((string)$sFee == 'yes') {
             $aData['addfee'] = 1;
         }
-
-        $sVoucher = $this->dibs_helper_getconfig('voucher');
-        if((string)$sVoucher == 'yes') {
-            $aData['voucher'] = 1;
-        }
-        
+     
         $sTest = $this->dibs_helper_getconfig('testmode');
         if((string)$sTest == 'yes') {
             $aData['test'] = 1;
@@ -275,20 +261,14 @@ class dibs_api extends dibs_helpers {
     function dibs_api_calcMAC($aData, $bURLDecode = FALSE) {
         $sMAC = "";
         $sHMAC = $this->dibs_helper_getconfig('hmac');
-        if($sHMAC != "") {
-            $sHMAC = $this->dibs_api_hextostr($sHMAC);
-            $sDataString = "";
+        if(!empty($sHMAC)) {
+            $sData = '';
+            if(isset($aData['MAC'])) unset($aData['MAC']);
             ksort($aData);
-            foreach($aData as $key => $value) {
-                if($bURLDecode === TRUE) {
-                    $sDataString .= "&" . trim($key) . "=" .trim(urldecode($value));
-                }
-                else {
-                    $sDataString .= "&" . trim($key) . "=" .trim($value);
-                }
+            foreach($aData as $sKey => $sVal) {
+                $sData .= '&' . $sKey . '=' . (($bUrlDecode === TRUE) ? urldecode($sVal) : $sVal);
             }
-            $sDataString = ltrim($sDataString, "&");
-            $sMAC = hash_hmac("sha256", $sDataString, $sHMAC);
+            $sMAC = hash_hmac('sha256', ltrim($sData, '&'), $this->dibs_api_hextostr($sHMAC));
         }
         return $sMAC;
     }
@@ -511,25 +491,13 @@ class dibs_api extends dibs_helpers {
     
     function dibs_api_checkMainFields($oOrder, $bURLDecode = TRUE) {
         
-        if (isset($_POST['orderid'])) {
-            $oOrder = $this->dibs_helper_getOrderObj($oOrder, TRUE);
-            if(!$oOrder->order_id) return 11;
+        if (!isset($_POST['orderid'])) {
+            return 12;
         }
-        else return 12;
-
-        $iPayMethod = $this->dibs_api_detectMethod();
-        if($iPayMethod == "2" && isset($_POST['voucherAmount']) && $_POST['voucherAmount'] > 0) {
-            $iAmount = $_POST['amountOriginal'];
-        }
-        else $iAmount = $_POST['amount'];
-
-        if(isset($_POST['fee']) && $iPayMethod != 3) {
-            $iFeeAmount = $iAmount - $_POST['fee'];
-        }
-        
+      
         if (isset($_POST['amount'])) {
-		if ((abs((int)$iAmount - $oOrder->total) >= 0.01) && 
-                   (abs((int)$iFeeAmount - $oOrder->total) >= 0.01)) return 21;
+    		//if ((abs((int)$iAmount - $oOrder->total) >= 0.01) && 
+                  // (abs((int)$iFeeAmount - $oOrder->total) >= 0.01)) return 21;
 	}
         else return 22;
 
@@ -592,68 +560,9 @@ class dibs_api extends dibs_helpers {
     
     function dibs_api_callback($oOrder) {
         $mErr = $this->dibs_api_checkMainFields($oOrder, FALSE);
-        if($mErr !== FALSE) exit($mErr);
-        
-   	$mStatus = $this->dibs_helper_dbquery_read("SELECT `status` FROM `" . 
-                                               $this->dibs_helper_getdbprefix() . 
-                                              "dibs_orderdata` WHERE `orderid` = '" . 
-                                               $this->dibs_api_sqlEncode($_POST['orderid']) . 
-                                              "' LIMIT 1;");
-       
-        if($this->dibs_helper_dbquery_read_single($mStatus, 'status') == 0) {
-            $iPayMethod = $this->dibs_api_detectMethod();
-            
-            $aFieldsList = $this->dibs_api_DBarray();
-            $aFields = array();
-            foreach($aFieldsList as $key => $val) {
-                if(($iPayMethod == 2 || $iPayMethod == 3)) {
-                    switch ($val) {
-                        case 'cardexpdate':
-                            if(isset($_POST['expYear']) && isset($_POST['expMonth'])) {
-                                $aFields[$key] = $_POST['expYear'] . 
-                                                 $_POST['expMonth'];
-                            }
-                        break;
-                        case 'cardprefix':
-                            if(isset($_POST['cardNumberMasked'])) {
-                                $aFields[$key] = substr($_POST['cardNumberMasked'], 0, 6);
-                            }
-                        break;
-                        default:
-                            if(isset($_POST[$val])) {
-                                $aFields[$key] = $_POST[$val];
-                            }
-                            else $_POST[$key] = 0;
-                        break;
-                    }
-                }
-                else {
-                    if(isset($_POST[$val])) {
-                        $aFields[$key] = $_POST[$val];
-                    }
-                    else $_POST[$key] = 0;
-                }
-            }
-                
-            $this->dibs_api_callbackPBB($aFields);
-           
-            $aFields['callback'] = '1';
-            $aFields['status'] = '1';
-            
+        if($mErr === FALSE) {
             $this->dibs_helper_afterCallback($oOrder);
-            
-            $sUpdate = '';
-            foreach ($aFields as $sCell => $sValue) {
-                $sUpdate .= '`' . $sCell.'`=' . "'" . $this->dibs_api_sqlEncode($sValue) . "',";
-            }
-            $sUpdate = rtrim($sUpdate, ",");
-            $this->dibs_helper_dbquery_write("UPDATE `" . 
-                                       $this->dibs_helper_getdbprefix() . 
-                                      "dibs_orderdata` SET " . $sUpdate . 
-                                      " WHERE `orderid`=" .
-                                      $aFields['orderid']." LIMIT 1;");
         }
-        else exit();
     }
     
     /** END OF DIBS API AREA **/
