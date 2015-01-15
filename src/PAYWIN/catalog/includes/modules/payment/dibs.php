@@ -31,7 +31,7 @@ class dibs extends dibs_api {
     function dibs() {
         global $order;
 
-        $this->signature = 'dibs|dibs|4.0.8.1|2.2';
+        $this->signature = 'dibs|dibs|4.0.9.1|2.2';
         //$this->api_version = '3.1';
 
         $this->code = 'dibs';
